@@ -3,8 +3,8 @@ import asyncio
 import logging
 import os
 import sys
-import threading # 新增：用于后台运行 Web 服务
-import uvicorn   # 新增：ASGI 服务器
+import threading # 用于后台运行 Web 服务
+import uvicorn   # ASGI 服务器
 from pathlib import Path
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -12,8 +12,11 @@ from apscheduler.triggers.cron import CronTrigger
 # Ensure project root in path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-# 新增：导入 app.py 中的 app 对象
-from app import app
+# ========================================================
+# 🔴 关键修改在这里：必须从 web 文件夹导入 app
+# ========================================================
+from web.app import app
+
 from config import load_config, CONFIG_PATH
 from database import init_db, cache_illust, get_cached_illust_tags, get_cached_illust, mark_pushed
 from pixiv_client import PixivClient
