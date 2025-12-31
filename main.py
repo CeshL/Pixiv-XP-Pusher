@@ -1,9 +1,10 @@
-
 import argparse
 import asyncio
 import logging
 import os
 import sys
+import threading # 新增：用于后台运行 Web 服务
+import uvicorn   # 新增：ASGI 服务器
 from pathlib import Path
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -11,6 +12,8 @@ from apscheduler.triggers.cron import CronTrigger
 # Ensure project root in path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+# 新增：导入 app.py 中的 app 对象
+from app import app
 from config import load_config, CONFIG_PATH
 from database import init_db, cache_illust, get_cached_illust_tags, get_cached_illust, mark_pushed
 from pixiv_client import PixivClient
@@ -865,6 +868,23 @@ def main():
         # Force once for test
         args.once = True
     
+    # =========================================================================
+    # 新增：集成 Web UI Server 启动逻辑
+    # 只有在非 --once 模式下（即长期运行模式）才启动 Web 服务
+    # 这样可以解决 Cloud Run 502 Bad Gateway 问题
+    # =========================================================================
+    if not args.once:
+        def run_web_thread():
+            # 必须监听 0.0.0.0 和端口 8080 (Cloud Run 要求)
+            # log_level 设为 warning 避免刷屏
+            uvicorn.run(app, host="0.0.0.0", port=8080, log_level="warning")
+        
+        # 使用 Daemon 线程，主程序退出时它也会退出
+        web_thread = threading.Thread(target=run_web_thread, daemon=True)
+        web_thread.start()
+        logger.info("🚀 Web UI Server 线程已启动 (端口 8080)...")
+    # =========================================================================
+
     if args.once:
         asyncio.run(run_once(config))
     else:
