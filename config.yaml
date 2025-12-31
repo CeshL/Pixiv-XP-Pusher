@@ -1,0 +1,60 @@
+pixiv:
+  user_id: 89799567       # 你的 Pixiv 用户 ID（用于分析 XP）
+  refresh_token: "czLc20szx5L8RzrfZHy1BQ9ldhoOZwAQrsi_cV35pVM"    # 必填，用于搜索/排行榜等操作
+
+  # [New!] 可选：同步专用 Token (仅用于获取收藏和关注动态)
+  # 使用独立 Token 可降低主号因搜索等操作被封禁的风险
+  sync_token: ""          # 留空则使用主 Token
+
+profiler:
+  ai:
+    enabled: true
+    provider: "openai"    # 支持 openai 格式接口
+    api_key: "sk-123456"
+    base_url: "https://youcnlqsxafb.ap-northeast-1.clawcloudrun.com/v1"
+    model: "[EXPRESS] gemini-3-flash-preview"
+  
+  scan_limit: 1000        # 每次分析收藏的数量
+  discovery_rate: 0.1     # 探索新 Tag 的概率
+
+fetcher:
+  # MAB 策略配额限制 (防止某一策略独占)
+  mab_limits:
+    min_quota: 0.2
+    max_quota: 0.6
+    
+  bookmark_threshold:
+    search: 1000          # 搜索结果的最低收藏数要求
+  subscribed_artists: []  # 额外关注的画师 ID 列表
+
+filter:
+  daily_limit: 100         # 每日推送上限
+  exclude_ai: true        # 过滤 AI 生成作品
+  r18_mode: true         # 是否允许 R18 (需 Token 权限)
+
+scheduler:
+  # 定时任务配置 (Cron 表达式: 分 时 日 月 周)
+  # 支持多个时间点，用逗号分隔
+  cron: "0 12 * * *, 0 21 * * *"
+  # 每日维护任务 (发送日报 + 清理数据)
+  daily_report_cron: "0 0 * * *"
+
+notifier:
+  # 启用的推送通道列表
+  types: [telegram] 
+  
+  telegram:
+    bot_token: "8507072251:AAGgHTSTEoo3N9E0R5_ZOs9Tzw4xk6BG4lc"
+    # 你的 Telegram User ID (必须配置，否则无法使用指令)
+    allowed_users: 
+      - '5813090457'
+    chat_ids: [5813090457]
+  
+  onebot:
+    ws_url: "ws://127.0.0.1:3001"
+    private_id: 12345678
+
+# 进阶配置 (可选)
+web:
+  password: ""  # 留空表示首次访问时设置
+  # 启动后访问 http://localhost:8080 查看管理面板
