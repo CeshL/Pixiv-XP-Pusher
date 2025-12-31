@@ -42,8 +42,23 @@ SESSION_EXPIRE_HOURS = 24
 
 
 def load_config() -> dict:
+    # 1. 先读取 yaml 文件
     with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
+        config = yaml.safe_load(f) or {}
+    # 2. 【新增】检查环境变量 WEB_PASSWORD
+    # 如果你在 Claw 设置了 WEB_PASSWORD，这里会自动读取
+    env_pwd = os.getenv("WEB_PASSWORD")
+    
+    if env_pwd:
+        if "web" not in config:
+            config["web"] = {}
+        
+        # ⚠️ 关键点：
+        # 环境变量里填的是明文 (例如 "123456")
+        # 程序这里自动把它转成哈希值，这样登录逻辑就能对上了
+        config["web"]["password"] = hash_password(env_pwd)
+        
+    return config
 
 
 def save_config(config: dict):
