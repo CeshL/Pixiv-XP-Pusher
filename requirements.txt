@@ -14,3 +14,10 @@ Pillow>=10.0.0
 selenium>=4.10.0
 webdriver-manager>=4.0.0
 imageio[ffmpeg]>=2.30.0
+fastapi
+uvicorn[standard]
+jinja2
+python-multipart
+aiohttp
+pyyaml
+
